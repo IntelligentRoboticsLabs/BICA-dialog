@@ -60,7 +60,7 @@ class DialogInterfaceTest: public bica_dialog::DialogInterface
 
 TEST(TESTSuite, instance_lib)
 {
-  std::string intent_in = "Visita-Reunion", intent_out;
+  std::string intent_in = "Default Welcome Intent", intent_out;
   bica_dialog::DialogInterfaceTest di(intent_in);
   intent_out = di.getIntent();
   if (intent_out != "")
@@ -69,26 +69,23 @@ TEST(TESTSuite, instance_lib)
 
 TEST(TESTSuite, speak)
 {
-  std::string intent_in = "Visita-Reunion";
+  std::string intent_in = "Default Welcome Intent";
   bica_dialog::DialogInterfaceTest di(intent_in);
-  EXPECT_TRUE(di.speak("Hola, buenos dias"));
+  EXPECT_TRUE(di.speak("Hello world!"));
 }
 
 TEST(TESTSuite, listen)
 {
-  std::string intent_in = "Visita-Reunion";
+  std::string intent_in = "Default Welcome Intent";
   bica_dialog::DialogInterfaceTest di(intent_in);
-
   di.listen();
 
-  //ros::AsyncSpinner spinner(2);
-  //spinner.start();
-
+  ros::AsyncSpinner spinner(2);
+  spinner.start();
   ros::Time t = ros::Time::now();
   while (t + ros::Duration(0.3) > ros::Time::now()) ros::spinOnce();
 
-  if (di.intent_ != "")
-    EXPECT_EQ(di.intent_ , intent_in);
+  EXPECT_EQ(di.intent_ , intent_in);
 }
 
 

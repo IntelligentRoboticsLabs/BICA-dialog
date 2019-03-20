@@ -1,0 +1,5 @@
+repositories:
+  dialogflow_ros:
+    type: git
+    url: https://github.com/jginesclavero/dialogflow_ros.git
+    version: master
