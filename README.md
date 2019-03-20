@@ -5,7 +5,7 @@ BICA-dialog contains the library DialogInterface from which we will inherit to d
 
 ## Use
 
-Below is an example of using the BICA-dialog library ([example file](https://github.com/IntelligentRoboticsLabs/BICA-dialog/blob/master/bica_dialog/test/test_DialogInterface.cpp))
+Below is an example of using the BICA-dialog library ([example file](https://github.com/IntelligentRoboticsLabs/BICA-dialog/blob/master/bica_dialog/test/test_DialogInterface.cpp)).
 First of all we define our new class that inherits from DialogInterface, passing the intent for which our action was defined.
 We have to redefine the listenCallback method to read the Dialogflow output like a ROS message.
 
