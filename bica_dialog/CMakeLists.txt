@@ -28,18 +28,14 @@ include_directories(
 set(ROSLINT_CPP_OPTS "--filter=-build/header_guard,-runtime/references,-whitespace/braces,-build/c++11")
 roslint_cpp()
 
-add_library(dialog_interface_lib
+add_library(bica_dialog
 	src/DialogInterface.cpp
 )
 
-add_dependencies(dialog_interface_lib ${catkin_EXPORTED_TARGETS})
-target_link_libraries(dialog_interface_lib ${catkin_LIBRARIES})
+add_dependencies(bica_dialog ${catkin_EXPORTED_TARGETS})
+target_link_libraries(bica_dialog ${catkin_LIBRARIES})
 
-add_executable(test src/test.cpp)
-add_dependencies(test ${catkin_EXPORTED_TARGETS} )
-target_link_libraries(test ${catkin_LIBRARIES} )
-
-install(TARGETS dialog_interface_lib dialog_interface_lib
+install(TARGETS bica_dialog bica_dialog
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})

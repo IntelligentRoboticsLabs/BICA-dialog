@@ -45,20 +45,22 @@
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
 #include <sound_play/SoundRequestAction.h>
-
+#include <regex>
 
 namespace bica_dialog
 {
 class DialogInterface
 {
 public:
-  explicit DialogInterface(std::string intent);
+  DialogInterface(std::string intent);
+  DialogInterface(std::regex intent_re);
 
   void dfCallback(const dialogflow_ros::DialogflowResult::ConstPtr& result);
   bool speak(std::string str);
   bool listen();
   virtual void listenCallback(dialogflow_ros::DialogflowResult result){}
   std::string getIntent();
+  std::regex getIntentRegex();
 
 protected:
   ros::NodeHandle nh_;
@@ -68,6 +70,8 @@ protected:
   ros::Subscriber df_result_sub_;
   ros::Publisher speak_pub_;
   actionlib::SimpleActionClient<sound_play::SoundRequestAction> ac;
+  std::regex intent_re_;
+  void init();
 };
 };  // namespace bica_dialog
 

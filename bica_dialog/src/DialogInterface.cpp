@@ -44,6 +44,17 @@ namespace bica_dialog
 DialogInterface::DialogInterface(std::string intent) :
   intent_(intent), nh_(), is_bussy_(false), ac("sound_play", true)
 {
+  init();
+}
+
+DialogInterface::DialogInterface(std::regex intent_re) :
+  intent_re_(intent_re), nh_(), is_bussy_(false), ac("sound_play", true)
+{
+  init();
+}
+
+void DialogInterface::init()
+{
   if (!nh_.getParam("/dialogflow_client/results_topic", results_topic_))
     results_topic_ = "/dialogflow_client/results";
   if (!nh_.getParam("/dialogflow_client/start_srv", start_srv_))
@@ -58,9 +69,14 @@ std::string DialogInterface::getIntent()
   return intent_;
 }
 
+std::regex DialogInterface::getIntentRegex()
+{
+  return intent_re_;
+}
+
 void DialogInterface::dfCallback(const dialogflow_ros::DialogflowResult::ConstPtr& result)
 {
-  if (result->intent == intent_)
+  if(result->intent == intent_ || std::regex_match(result->intent, intent_re_))
   {
     listenCallback(*result);
     is_bussy_ = false;

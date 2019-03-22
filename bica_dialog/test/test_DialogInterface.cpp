@@ -43,6 +43,7 @@
 #include <string>
 #include <vector>
 #include <ros/package.h>
+#include <regex>
 
 namespace bica_dialog {
 class DialogInterfaceTest: public bica_dialog::DialogInterface
@@ -56,6 +57,18 @@ class DialogInterfaceTest: public bica_dialog::DialogInterface
       intent_ = result.intent;
     }
 };
+
+class DialogInterfaceTestRe: public bica_dialog::DialogInterface
+{
+  public:
+    dialogflow_ros::DialogflowResult result_;
+    DialogInterfaceTestRe(std::regex intent): DialogInterface(intent){}
+    void listenCallback(dialogflow_ros::DialogflowResult result)
+    {
+      ROS_INFO("[DialogInterfaceTest] listenCallback: intent %s", result.intent.c_str());
+      result_ = result;
+    }
+};
 }  // namespace bica_dialog
 
 TEST(TESTSuite, instance_lib)
@@ -65,6 +78,19 @@ TEST(TESTSuite, instance_lib)
   intent_out = di.getIntent();
   if (intent_out != "")
     EXPECT_EQ(intent_out, intent_in);
+}
+
+TEST(TESTSuite, instance_lib_re)
+{
+  std::string intent_out;
+  std::regex intent_in("[[:alnum:]_]*.info");
+  bica_dialog::DialogInterfaceTestRe di(intent_in);
+
+  di.listen();
+  ros::Time t = ros::Time::now();
+  while (t + ros::Duration(0.3) > ros::Time::now()) ros::spinOnce();
+
+  EXPECT_TRUE(di.speak(di.result_.fulfillment_text));
 }
 
 TEST(TESTSuite, speak)
@@ -88,10 +114,27 @@ TEST(TESTSuite, listen)
   EXPECT_EQ(di.intent_ , intent_in);
 }
 
+//TEST(TESTSuite, listen_loop)
+//{
+//  std::string intent_in = "Default Welcome Intent";
+//  bica_dialog::DialogInterfaceTest di(intent_in);
+//
+//  ros::AsyncSpinner spinner(2);
+//  spinner.start();
+//
+//  while (ros::ok())
+//  {
+//    di.listen();
+//  }
+//
+//  //EXPECT_EQ(di.intent_ , intent_in);
+//}
+
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "test_DialogInterface");
   testing::InitGoogleTest(&argc, argv);
+  ros::NodeHandle nh;
   return RUN_ALL_TESTS();
 }
