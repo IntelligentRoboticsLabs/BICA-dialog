@@ -54,6 +54,7 @@ class DialogInterface
 public:
   DialogInterface(std::string intent);
   DialogInterface(std::regex intent_re);
+  DialogInterface();
 
   void dfCallback(const dialogflow_ros::DialogflowResult::ConstPtr& result);
   bool speak(std::string str);

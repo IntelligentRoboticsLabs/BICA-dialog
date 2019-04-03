@@ -53,6 +53,11 @@ DialogInterface::DialogInterface(std::regex intent_re) :
   init();
 }
 
+DialogInterface::DialogInterface() : nh_(), is_bussy_(false), ac("sound_play", true)
+{
+  init();
+}
+
 void DialogInterface::init()
 {
   if (!nh_.getParam("/dialogflow_client/results_topic", results_topic_))
@@ -60,7 +65,6 @@ void DialogInterface::init()
   if (!nh_.getParam("/dialogflow_client/start_srv", start_srv_))
     start_srv_ = "/dialogflow_client/start";
   speak_topic_ = "/bica_dialog/speak";
-  df_srv_ = nh_.serviceClient<std_srvs::Empty>(start_srv_, 1);
   df_result_sub_ = nh_.subscribe(results_topic_, 1, &DialogInterface::dfCallback, this);
 }
 
@@ -78,8 +82,8 @@ void DialogInterface::dfCallback(const dialogflow_ros::DialogflowResult::ConstPt
 {
   if(result->intent == intent_ || std::regex_match(result->intent, intent_re_))
   {
-    listenCallback(*result);
     is_bussy_ = false;
+    listenCallback(*result);
   }
 }
 
@@ -115,15 +119,10 @@ bool DialogInterface::speak(std::string str)
 
 bool DialogInterface::listen()
 {
-  if (is_bussy_)
-    return !is_bussy_;
-  else
-  {
-    is_bussy_ = true;
-    std_srvs::Empty srv;
-    df_srv_.call(srv);
-    return true;
-  }
+  std_srvs::Empty srv;
+  ros::ServiceClient df_srv = nh_.serviceClient<std_srvs::Empty>(start_srv_, 1);
+  df_srv.call(srv);
+  return true;
 }
 
 };  // namespace bica_dialog
