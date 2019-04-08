@@ -54,6 +54,6 @@ if(CATKIN_ENABLE_TESTING)
   target_link_libraries(
     ${PROJECT_NAME}-test
     ${catkin_LIBRARIES}
-    dialog_interface_lib
+    bica_dialog
   )
 endif()
