@@ -51,7 +51,7 @@ class DialogInterfaceTest: public bica_dialog::DialogInterface
   public:
     std::string intent_;
     explicit DialogInterfaceTest(std::string intent): DialogInterface(intent){}
-    void listenCallback(dialogflow_ros::DialogflowResult result)
+    void listenCallback(dialogflow_ros_msgs::DialogflowResult result)
     {
       ROS_INFO("[DialogInterfaceTest] listenCallback: intent %s", result.intent.c_str());
       intent_ = result.intent;
@@ -61,9 +61,9 @@ class DialogInterfaceTest: public bica_dialog::DialogInterface
 class DialogInterfaceTestRe: public bica_dialog::DialogInterface
 {
   public:
-    dialogflow_ros::DialogflowResult result_;
+    dialogflow_ros_msgs::DialogflowResult result_;
     DialogInterfaceTestRe(std::regex intent): DialogInterface(intent){}
-    void listenCallback(dialogflow_ros::DialogflowResult result)
+    void listenCallback(dialogflow_ros_msgs::DialogflowResult result)
     {
       ROS_INFO("[DialogInterfaceTest] listenCallback: intent %s", result.intent.c_str());
       result_ = result;
@@ -83,7 +83,7 @@ TEST(TESTSuite, instance_lib)
 TEST(TESTSuite, instance_lib_re)
 {
   std::string intent_out;
-  std::regex intent_in("[[:alnum:]_]*.info");
+  std::regex intent_in("[[:print:]_]*.info");
   bica_dialog::DialogInterfaceTestRe di(intent_in);
 
   di.listen();

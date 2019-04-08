@@ -5,7 +5,7 @@ add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  dialogflow_ros
+  dialogflow_ros_msgs
   roslint
   std_srvs
   sound_play
@@ -16,7 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 	INCLUDE_DIRS include
 	LIBRARIES bica_dialog
-	CATKIN_DEPENDS roscpp dialogflow_ros actionlib_msgs
+	CATKIN_DEPENDS roscpp dialogflow_ros_msgs actionlib_msgs
 	DEPENDS
 )
 

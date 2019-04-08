@@ -40,7 +40,7 @@
 
 #include <ros/ros.h>
 #include <string>
-#include <dialogflow_ros/DialogflowResult.h>
+#include <dialogflow_ros_msgs/DialogflowResult.h>
 #include <std_srvs/Empty.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
@@ -56,10 +56,10 @@ public:
   DialogInterface(std::regex intent_re);
   DialogInterface();
 
-  void dfCallback(const dialogflow_ros::DialogflowResult::ConstPtr& result);
+  void dfCallback(const dialogflow_ros_msgs::DialogflowResult::ConstPtr& result);
   bool speak(std::string str);
   bool listen();
-  virtual void listenCallback(dialogflow_ros::DialogflowResult result){}
+  virtual void listenCallback(dialogflow_ros_msgs::DialogflowResult result){}
   std::string getIntent();
   std::regex getIntentRegex();
 
