@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   dialogflow_ros_msgs
   roslint
   std_srvs
+  std_msgs
   sound_play
   actionlib
   actionlib_msgs
@@ -34,6 +35,10 @@ add_library(bica_dialog
 
 add_dependencies(bica_dialog ${catkin_EXPORTED_TARGETS})
 target_link_libraries(bica_dialog ${catkin_LIBRARIES})
+
+add_executable(example_df_node src/example/exampleDF.cpp)
+add_dependencies(example_df_node ${catkin_EXPORTED_TARGETS} )
+target_link_libraries(example_df_node ${catkin_LIBRARIES} bica_dialog)
 
 install(TARGETS bica_dialog bica_dialog
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

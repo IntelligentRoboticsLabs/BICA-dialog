@@ -80,6 +80,13 @@ TEST(TESTSuite, instance_lib)
     EXPECT_EQ(intent_out, intent_in);
 }
 
+TEST(TESTSuite, speak)
+{
+  std::string intent_in = "Default Welcome Intent";
+  bica_dialog::DialogInterfaceTest di(intent_in);
+  EXPECT_TRUE(di.speak("Hello world!"));
+}
+
 TEST(TESTSuite, instance_lib_re)
 {
   std::string intent_out;
@@ -91,13 +98,6 @@ TEST(TESTSuite, instance_lib_re)
   while (t + ros::Duration(0.3) > ros::Time::now()) ros::spinOnce();
 
   EXPECT_TRUE(di.speak(di.result_.fulfillment_text));
-}
-
-TEST(TESTSuite, speak)
-{
-  std::string intent_in = "Default Welcome Intent";
-  bica_dialog::DialogInterfaceTest di(intent_in);
-  EXPECT_TRUE(di.speak("Hello world!"));
 }
 
 TEST(TESTSuite, listen)
