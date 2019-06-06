@@ -32,15 +32,15 @@ roslint_cpp()
 add_library(bica_dialog
 	src/DialogInterface.cpp
 )
-
 add_dependencies(bica_dialog ${catkin_EXPORTED_TARGETS})
 target_link_libraries(bica_dialog ${catkin_LIBRARIES})
+
 
 add_executable(example_df_node src/example/exampleDF.cpp)
 add_dependencies(example_df_node ${catkin_EXPORTED_TARGETS} )
 target_link_libraries(example_df_node ${catkin_LIBRARIES} bica_dialog)
 
-install(TARGETS bica_dialog bica_dialog
+install(TARGETS bica_dialog
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})

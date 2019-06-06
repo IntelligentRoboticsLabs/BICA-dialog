@@ -44,7 +44,7 @@ namespace bica_dialog
 class ForwarderDF: public bica_dialog::DialogInterface
 {
   public:
-    ForwarderDF(std::regex intent): nh_(), DialogInterface(intent)
+    ForwarderDF(std::string intent): nh_(), DialogInterface(intent)
     {
       trigger_sub_ = nh_.subscribe("/listen", 1, &ForwarderDF::triggerCallback, this);
     }
@@ -71,8 +71,7 @@ class ForwarderDF: public bica_dialog::DialogInterface
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "example_df_node");
-  std::regex intent_in("[[:print:]_]*.info");
-  bica_dialog::ForwarderDF forwarder(intent_in);
+  bica_dialog::ForwarderDF forwarder("[[:print:]_]*.info");
   ros::spin();
   return 0;
 }

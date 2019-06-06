@@ -53,7 +53,6 @@ class DialogInterface
 {
 public:
   DialogInterface(std::string intent);
-  DialogInterface(std::regex intent_re);
   DialogInterface();
 
   void dfCallback(const dialogflow_ros_msgs::DialogflowResult::ConstPtr& result);
@@ -62,17 +61,26 @@ public:
   virtual void listenCallback(dialogflow_ros_msgs::DialogflowResult result){}
   std::string getIntent();
   std::regex getIntentRegex();
+  void setIdleState(bool state);
+  bool isIdle();
+  void setCallTime(ros::Time t);
+  ros::Time getCallTime();
 
 protected:
+  actionlib::SimpleActionClient<sound_play::SoundRequestAction> ac;
+
+private:
+  bool idle_;
   ros::NodeHandle nh_;
   std::string intent_, results_topic_, start_srv_, speak_topic_;
-  bool is_bussy_;
   ros::ServiceClient df_srv_;
   ros::Subscriber df_result_sub_;
   ros::Publisher speak_pub_;
-  actionlib::SimpleActionClient<sound_play::SoundRequestAction> ac;
   std::regex intent_re_;
+  ros::Time last_call_;
   void init();
+
+
 };
 };  // namespace bica_dialog
 

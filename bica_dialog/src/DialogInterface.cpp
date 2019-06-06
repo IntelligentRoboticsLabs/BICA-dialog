@@ -42,18 +42,12 @@
 namespace bica_dialog
 {
 DialogInterface::DialogInterface(std::string intent) :
-  intent_(intent), nh_(), is_bussy_(false), ac("sound_play", true)
+  intent_(intent), nh_(), ac("sound_play", true)
 {
   init();
 }
 
-DialogInterface::DialogInterface(std::regex intent_re) :
-  intent_re_(intent_re), nh_(), is_bussy_(false), ac("sound_play", true)
-{
-  init();
-}
-
-DialogInterface::DialogInterface() : nh_(), is_bussy_(false), ac("sound_play", true)
+DialogInterface::DialogInterface() : nh_(), ac("sound_play", true)
 {
   init();
 }
@@ -66,6 +60,8 @@ void DialogInterface::init()
     start_srv_ = "/dialogflow_client/start";
   speak_topic_ = "/bica_dialog/speak";
   df_result_sub_ = nh_.subscribe(results_topic_, 1, &DialogInterface::dfCallback, this);
+  idle_ = true;
+  setCallTime(ros::Time::now());
 }
 
 std::string DialogInterface::getIntent()
@@ -75,55 +71,72 @@ std::string DialogInterface::getIntent()
 
 std::regex DialogInterface::getIntentRegex()
 {
+  std::regex intent_re_(intent_);
   return intent_re_;
 }
 
 void DialogInterface::dfCallback(const dialogflow_ros_msgs::DialogflowResult::ConstPtr& result)
 {
-  if(result->intent == intent_ || std::regex_match(result->intent, intent_re_))
+  std::regex intent_re_(intent_);
+  if(std::regex_match(result->intent, intent_re_) && result->intent.size() > 0)
   {
-    is_bussy_ = false;
+    setCallTime(ros::Time::now());
     listenCallback(*result);
   }
-
 }
 
 bool DialogInterface::speak(std::string str)
 {
-  if (is_bussy_)
-    return !is_bussy_;
+  ac.waitForServer();
+  sound_play::SoundRequestGoal goal;
+  goal.sound_request.sound = sound_play::SoundRequest::SAY;
+  goal.sound_request.command = sound_play::SoundRequest::PLAY_ONCE;
+  goal.sound_request.arg = str;
+  goal.sound_request.volume = 1.0;
+  ac.sendGoal(goal);
+
+  bool finished_before_timeout = ac.waitForResult(ros::Duration(30.0));
+
+  if (finished_before_timeout)
+  {
+    actionlib::SimpleClientGoalState state = ac.getState();
+    ROS_INFO("Sound_play Action finished: %s",state.toString().c_str());
+    return true;
+  }
   else
   {
-    ac.waitForServer();
-    sound_play::SoundRequestGoal goal;
-    goal.sound_request.sound = sound_play::SoundRequest::SAY;
-    goal.sound_request.command = sound_play::SoundRequest::PLAY_ONCE;
-    goal.sound_request.arg = str;
-    goal.sound_request.volume = 1.0;
-    ac.sendGoal(goal);
-
-    bool finished_before_timeout = ac.waitForResult(ros::Duration(30.0));
-
-    if (finished_before_timeout)
-    {
-      actionlib::SimpleClientGoalState state = ac.getState();
-      ROS_INFO("Sound_play Action finished: %s",state.toString().c_str());
-      return true;
-    }
-    else
-    {
-      ROS_INFO("Sound_play Action did not finish before the time out.");
-      return false;
-    }
+    ROS_INFO("Sound_play Action did not finish before the time out.");
+    return false;
   }
 }
 
 bool DialogInterface::listen()
 {
+  ROS_INFO("[DialogInterface] listening...");
   std_srvs::Empty srv;
   ros::ServiceClient df_srv = nh_.serviceClient<std_srvs::Empty>(start_srv_, 1);
   df_srv.call(srv);
   return true;
+}
+
+void DialogInterface::setIdleState(bool state)
+{
+  idle_ = state;
+}
+
+bool DialogInterface::isIdle()
+{
+  return idle_;
+}
+
+void DialogInterface::setCallTime(ros::Time t)
+{
+  last_call_ = t;
+}
+
+ros::Time DialogInterface::getCallTime()
+{
+  return last_call_;
 }
 
 };  // namespace bica_dialog
