@@ -42,12 +42,12 @@
 namespace bica_dialog
 {
 DialogInterface::DialogInterface(std::string intent) :
-  intent_(intent), nh_(), ac("sound_play", true)
+  intent_(intent), nh_()
 {
   init();
 }
 
-DialogInterface::DialogInterface() : nh_(), ac("sound_play", true)
+DialogInterface::DialogInterface() : nh_()
 {
   init();
 }
@@ -58,8 +58,10 @@ void DialogInterface::init()
     results_topic_ = "/dialogflow_client/results";
   if (!nh_.getParam("/dialogflow_client/start_srv", start_srv_))
     start_srv_ = "/dialogflow_client/start";
-  speak_topic_ = "/bica_dialog/speak";
+
   df_result_sub_ = nh_.subscribe(results_topic_, 1, &DialogInterface::dfCallback, this);
+  talk_client_ = nh_.serviceClient<sound_play::Talk>("/bica_dialog/talk");
+
   idle_ = true;
   setCallTime(ros::Time::now());
 }
@@ -87,27 +89,9 @@ void DialogInterface::dfCallback(const dialogflow_ros_msgs::DialogflowResult::Co
 
 bool DialogInterface::speak(std::string str)
 {
-  ac.waitForServer();
-  sound_play::SoundRequestGoal goal;
-  goal.sound_request.sound = sound_play::SoundRequest::SAY;
-  goal.sound_request.command = sound_play::SoundRequest::PLAY_ONCE;
-  goal.sound_request.arg = str;
-  goal.sound_request.volume = 1.0;
-  ac.sendGoal(goal);
-
-  bool finished_before_timeout = ac.waitForResult(ros::Duration(30.0));
-
-  if (finished_before_timeout)
-  {
-    actionlib::SimpleClientGoalState state = ac.getState();
-    ROS_INFO("Sound_play Action finished: %s",state.toString().c_str());
-    return true;
-  }
-  else
-  {
-    ROS_INFO("Sound_play Action did not finish before the time out.");
-    return false;
-  }
+  sound_play::Talk srv;
+  srv.request.str = str;
+  talk_client_.call(srv);
 }
 
 bool DialogInterface::listen()

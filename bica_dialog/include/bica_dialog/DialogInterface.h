@@ -42,9 +42,7 @@
 #include <string>
 #include <dialogflow_ros_msgs/DialogflowResult.h>
 #include <std_srvs/Empty.h>
-#include <actionlib/client/simple_action_client.h>
-#include <actionlib/client/terminal_state.h>
-#include <sound_play/SoundRequestAction.h>
+#include <sound_play/Talk.h>
 #include <regex>
 
 namespace bica_dialog
@@ -66,16 +64,12 @@ public:
   void setCallTime(ros::Time t);
   ros::Time getCallTime();
 
-protected:
-  actionlib::SimpleActionClient<sound_play::SoundRequestAction> ac;
-
 private:
   bool idle_;
   ros::NodeHandle nh_;
-  std::string intent_, results_topic_, start_srv_, speak_topic_;
-  ros::ServiceClient df_srv_;
+  std::string intent_, results_topic_, start_srv_;
+  ros::ServiceClient talk_client_;
   ros::Subscriber df_result_sub_;
-  ros::Publisher speak_pub_;
   std::regex intent_re_;
   ros::Time last_call_;
   void init();
